@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>MediaDown — YouTube & Filmes</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #131b2e;
+      --card-border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --yt-red: #ef4444;
+      --yt-red-hover: #dc2626;
+      --music-purple: #8b5cf6;
+      --music-purple-hover: #7c3aed;
+      --movie-emerald: #10b981;
+      --movie-emerald-hover: #059669;
+      --input-bg: #090d16;
+      --accent-blue: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #172036 0%, var(--bg) 60%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px 14px 48px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 820px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
+    .icon-yt {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .icon-movie {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .card-title h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .card-title span {
+      font-size: 0.83rem;
+      color: var(--muted);
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid #26334d;
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea {
+      min-height: 98px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, opacity 0.2s, background 0.2s;
+      color: #fff;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-ghost {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 10px 13px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .btn-ghost:hover {
+      background: #334155;
+    }
+
+    .btn-video {
+      background: var(--yt-red);
+      flex: 1;
+    }
+
+    .btn-video:hover {
+      background: var(--yt-red-hover);
+    }
+
+    .btn-audio {
+      background: var(--music-purple);
+      flex: 1;
+    }
+
+    .btn-audio:hover {
+      background: var(--music-purple-hover);
+    }
+
+    .btn-movie {
+      background: var(--movie-emerald);
+      width: 100%;
+    }
+
+    .btn-movie:hover {
+      background: var(--movie-emerald-hover);
+    }
+
+    .btn-movie-secondary {
+      background: #1e293b;
+      border: 1px solid #334155;
+      width: 100%;
+      font-size: 0.86rem;
+      padding: 10px 14px;
+    }
+
+    .btn-movie-secondary:hover {
+      background: #283548;
+    }
+
+    .action-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 460px) {
+      .action-row {
+        flex-direction: row;
+      }
+    }
+
+    .preview-box {
+      display: none;
+      background: rgba(9, 13, 22, 0.7);
+      border: 1px solid #243049;
+      border-radius: 12px;
+      padding: 12px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .preview-box.active {
+      display: flex;
+    }
+
+    .preview-thumb {
+      width: 96px;
+      height: 58px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #000;
+      flex-shrink: 0;
+    }
+
+    .preview-info {
+      overflow: hidden;
+    }
+
+    .preview-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .progress-box {
+      display: none;
+      background: #090d16;
+      border: 1px solid #26334d;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .progress-box.active {
+      display: block;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.83rem;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      transition: width 0.25s ease;
+    }
+
+    .progress-sub {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .detected-badge {
+      display: none;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      word-break: break-all;
+    }
+
+    .detected-badge.active {
+      display: block;
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+    }
+
+    .error-msg.active {
+      display: block;
+    }
+
+    .network-banner {
+      margin-top: 24px;
+      background: rgba(19, 27, 46, 0.8);
+      border: 1px dashed #334155;
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .network-banner code {
+      background: #090d16;
+      color: #38bdf8;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-badge">⚡ PC & Celular • Pronto para Nuvem</div>
+      <h1>Central de Downloads</h1>
+      <p>Baixe vídeos/músicas do YouTube ou filmes direto pelo código <code>&lt;source&gt;</code></p>
+    </header>
+
+    <div class="grid">
+      <!-- CARD 1: YOUTUBE -->
+      <section class="card">
+        <div class="card-header">
+          <div class="icon-box icon-yt">▶</div>
+          <div class="card-title">
+            <h2>YouTube Downloader</h2>
+            <span>Vídeo em Alta Qualidade (MP4) ou Música (MP3)</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="yt-url">Link do YouTube</label>
+          <div class="input-group">
+            <input
+              type="url"
+              id="yt-url"
+              placeholder="https://www.youtube.com/watch?v=..."
+              autocomplete="off"
+            />
+            <button type="button" class="btn btn-ghost" onclick="pasteTo('yt-url', true)">Colar</button>
+          </div>
+        </div>
+
+        <div id="yt-preview" class="preview-box">
+          <img id="yt-thumb" class="preview-thumb" src="" alt="Thumbnail" />
+          <div class="preview-info">
+            <div id="yt-title" class="preview-title">Carregando...</div>
+            <div id="yt-meta" class="preview-meta"></div>
+          </div>
+        </div>
+
+        <div>
+          <label for="yt-quality">Qualidade do Vídeo (para opção de Vídeo)</label>
+          <select id="yt-quality">
+            <option value="best">🌟 Máxima Qualidade Disponível (1080p / 4K + Áudio)</option>
+            <option value="1080">Full HD (1080p MP4)</option>
+            <option value="720">HD (720p MP4)</option>
+            <option value="480">Média (480p MP4)</option>
+            <option value="360">Leve / Celular (360p MP4)</option>
+          </select>
+        </div>
+
+        <div class="action-row">
+          <button type="button" id="btn-yt-video" class="btn btn-video" onclick="startYouTubeDownload('video')">
+            🎬 Baixar Vídeo (MP4)
+          </button>
+          <button type="button" id="btn-yt-audio" class="btn btn-audio" onclick="startYouTubeDownload('audio')">
+            🎵 Baixar Música (MP3)
+          </button>
+        </div>
+
+        <div id="yt-error" class="error-msg"></div>
+
+        <div id="yt-progress-box" class="progress-box">
+          <div class="progress-header">
+            <span id="yt-stage">Iniciando...</span>
+            <strong id="yt-percent">0%</strong>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="yt-bar" class="progress-bar-fill"></div>
+          </div>
+          <div class="progress-sub">
+            <span id="yt-speed"></span>
+            <span id="yt-eta"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARD 2: FILME (<source src="...">) -->
+      <section class="card">
+        <div class="card-header">
+          <div class="icon-box icon-movie">🎞️</div>
+          <div class="card-title">
+            <h2>Baixar Filme por Código</h2>
+            <span>Cole a tag <code>&lt;source src="..."&gt;</code> ou URL do vídeo</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="movie-code" style="margin-bottom: 0;">Código <code>&lt;source&gt;</code> do Filme</label>
+            <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 0.78rem;" onclick="pasteTo('movie-code', false)">Colar Código</button>
+          </div>
+          <textarea
+            id="movie-code"
+            placeholder='<source src="https://cdnst79.tokyvideo.com/videos/.../video.mp4?secure=..." type="video/mp4">'
+            oninput="detectSourceRealtime()"
+          ></textarea>
+        </div>
+
+        <div id="movie-detected" class="detected-badge"></div>
+
+        <div>
+          <label for="movie-name">Nome para salvar o filme (opcional)</label>
+          <input
+            type="text"
+            id="movie-name"
+            placeholder="Ex: Meu Filme Favorito"
+          />
+        </div>
+
+        <button type="button" id="btn-movie-direct" class="btn btn-movie" onclick="downloadMovieDirect()">
+          ⬇️ Baixar Filme Agora (Direto no Dispositivo)
+        </button>
+
+        <button type="button" id="btn-movie-job" class="btn btn-movie-secondary" onclick="downloadMovieWithProgress()">
+          📊 Baixar com Barra de Progresso no Sistema
+        </button>
+
+        <div id="movie-error" class="error-msg"></div>
+
+        <div id="movie-progress-box" class="progress-box">
+          <div class="progress-header">
+            <span id="movie-stage">Conectando...</span>
+            <strong id="movie-percent">0%</strong>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="movie-bar" class="progress-bar-fill"></div>
+          </div>
+          <div class="progress-sub">
+            <span id="movie-speed"></span>
+            <span id="movie-eta"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="network-banner" id="network-banner">
+      <div>
+        📱 <strong>Para usar no Celular (mesmo Wi-Fi):</strong> acesse no navegador do celular:
+        <span id="local-urls">carregando...</span>
+      </div>
+      <div id="ffmpeg-status"></div>
+    </div>
+  </div>
+
+  <script>
+    let ytInfoTimeout = null;
+
+    async function loadSystemInfo() {
+      try {
+        const res = await fetch('/api/system-info');
+        const data = await res.json();
+        const urlsEl = document.getElementById('local-urls');
+        if (data.local_urls && data.local_urls.length > 0) {
+          urlsEl.innerHTML = data.local_urls.map(u => `<code>${u}</code>`).join(' ou ');
+        } else {
+          urlsEl.innerHTML = `<code>${window.location.origin}</code>`;
+        }
+        const ffEl = document.getElementById('ffmpeg-status');
+        ffEl.innerHTML = data.ffmpeg_ready
+          ? '✅ Motor Alta Qualidade (FFmpeg) Ativo'
+          : '⚠️ FFmpeg não detectado';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function pasteTo(inputId, isYoutube) {
+      const el = document.getElementById(inputId);
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          el.value = text;
+          if (isYoutube) {
+            fetchYouTubePreview();
+          } else {
+            detectSourceRealtime();
+          }
+        }
+      } catch (err) {
+        el.focus();
+      }
+    }
+
+    document.getElementById('yt-url').addEventListener('input', () => {
+      clearTimeout(ytInfoTimeout);
+      ytInfoTimeout = setTimeout(fetchYouTubePreview, 500);
+    });
+
+    async function fetchYouTubePreview() {
+      const url = document.getElementById('yt-url').value.trim();
+      const previewBox = document.getElementById('yt-preview');
+      const errorBox = document.getElementById('yt-error');
+      errorBox.classList.remove('active');
+
+      if (!url || (!url.includes('youtube.com') && !url.includes('youtu.be'))) {
+        previewBox.classList.remove('active');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/youtube/info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        if (!res.ok) return;
+        const info = await res.json();
+        document.getElementById('yt-thumb').src = info.thumbnail || '';
+        document.getElementById('yt-title').textContent = info.title;
+        const mins = info.duration ? `${Math.floor(info.duration / 60)}m${info.duration % 60}s` : '';
+        document.getElementById('yt-meta').textContent = [info.uploader, mins].filter(Boolean).join(' • ');
+        previewBox.classList.add('active');
+      } catch (e) {
+        // Ignora erro silencioso no preview automático
+      }
+    }
+
+    async function startYouTubeDownload(mode) {
+      const url = document.getElementById('yt-url').value.trim();
+      const quality = document.getElementById('yt-quality').value;
+      const errorBox = document.getElementById('yt-error');
+      const progressBox = document.getElementById('yt-progress-box');
+      const btnVideo = document.getElementById('btn-yt-video');
+      const btnAudio = document.getElementById('btn-yt-audio');
+
+      errorBox.classList.remove('active');
+      if (!url) {
+        errorBox.textContent = 'Por favor, cole a URL do vídeo do YouTube primeiro.';
+        errorBox.classList.add('active');
+        return;
+      }
+
+      btnVideo.disabled = true;
+      btnAudio.disabled = true;
+      progressBox.classList.add('active');
+      document.getElementById('yt-stage').textContent = 'Preparando download...';
+      document.getElementById('yt-percent').textContent = '0%';
+      document.getElementById('yt-bar').style.width = '0%';
+
+      try {
+        const res = await fetch('/api/youtube/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, mode, quality })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Erro ao iniciar download.');
+        }
+        pollJob(data.job_id, 'yt', () => {
+          btnVideo.disabled = false;
+          btnAudio.disabled = false;
+        });
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.add('active');
+        progressBox.classList.remove('active');
+        btnVideo.disabled = false;
+        btnAudio.disabled = false;
+      }
+    }
+
+    function extractClientSideUrl(raw) {
+      if (!raw) return null;
+      const srcMatch = raw.match(/src\s*=\s*["']([^"']+)["']/i);
+      if (srcMatch && srcMatch[1]) {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = srcMatch[1].trim();
+        return txt.value;
+      }
+      const urlMatch = raw.match(/https?:\/\/[^\s"'<>]+/i);
+      if (urlMatch) {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = urlMatch[0].trim();
+        return txt.value;
+      }
+      return null;
+    }
+
+    function detectSourceRealtime() {
+      const code = document.getElementById('movie-code').value;
+      const badge = document.getElementById('movie-detected');
+      const errorBox = document.getElementById('movie-error');
+      errorBox.classList.remove('active');
+
+      const url = extractClientSideUrl(code);
+      if (url) {
+        badge.innerHTML = `✅ <strong>Link do vídeo identificado automaticamente:</strong><br/>${url.substring(0, 95)}${url.length > 95 ? '...' : ''}`;
+        badge.classList.add('active');
+      } else {
+        badge.classList.remove('active');
+      }
+    }
+
+    async function downloadMovieDirect() {
+      const code = document.getElementById('movie-code').value.trim();
+      const filename = document.getElementById('movie-name').value.trim() || 'filme';
+      const errorBox = document.getElementById('movie-error');
+      errorBox.classList.remove('active');
+
+      if (!code) {
+        errorBox.textContent = 'Cole o código <source src="..."> do filme primeiro!';
+        errorBox.classList.add('active');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/movie/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, filename })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Não foi possível extrair a URL.');
+        }
+
+        // Dispara o stream direto como download de arquivo no navegador (PC ou Celular)
+        const streamUrl = `/api/movie/stream?url=${encodeURIComponent(data.extracted_url)}&filename=${encodeURIComponent(data.suggested_filename)}`;
+        const a = document.createElement('a');
+        a.href = streamUrl;
+        a.download = data.suggested_filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.add('active');
+      }
+    }
+
+    async function downloadMovieWithProgress() {
+      const code = document.getElementById('movie-code').value.trim();
+      const filename = document.getElementById('movie-name').value.trim() || 'filme';
+      const errorBox = document.getElementById('movie-error');
+      const progressBox = document.getElementById('movie-progress-box');
+      const btnDirect = document.getElementById('btn-movie-direct');
+      const btnJob = document.getElementById('btn-movie-job');
+
+      errorBox.classList.remove('active');
+      if (!code) {
+        errorBox.textContent = 'Cole o código <source src="..."> do filme primeiro!';
+        errorBox.classList.add('active');
+        return;
+      }
+
+      btnDirect.disabled = true;
+      btnJob.disabled = true;
+      progressBox.classList.add('active');
+      document.getElementById('movie-stage').textContent = 'Extraindo código <source>...';
+      document.getElementById('movie-percent').textContent = '0%';
+      document.getElementById('movie-bar').style.width = '0%';
+
+      try {
+        const extRes = await fetch('/api/movie/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, filename })
+        });
+        const extData = await extRes.json();
+        if (!extRes.ok) {
+          throw new Error(extData.detail || 'Erro ao extrair código.');
+        }
+
+        const jobRes = await fetch('/api/movie/download-job', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: extData.extracted_url,
+            filename: extData.suggested_filename
+          })
+        });
+        const jobData = await jobRes.json();
+        if (!jobRes.ok) {
+          throw new Error(jobData.detail || 'Erro ao iniciar download do filme.');
+        }
+
+        pollJob(jobData.job_id, 'movie', () => {
+          btnDirect.disabled = false;
+          btnJob.disabled = false;
+        });
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.classList.add('active');
+        progressBox.classList.remove('active');
+        btnDirect.disabled = false;
+        btnJob.disabled = false;
+      }
+    }
+
+    function pollJob(jobId, prefix, onDone) {
+      const stageEl = document.getElementById(`${prefix}-stage`);
+      const percentEl = document.getElementById(`${prefix}-percent`);
+      const barEl = document.getElementById(`${prefix}-bar`);
+      const speedEl = document.getElementById(`${prefix}-speed`);
+      const etaEl = document.getElementById(`${prefix}-eta`);
+      const errorBox = document.getElementById(`${prefix}-error`);
+
+      const timer = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/jobs/${jobId}`);
+          if (!res.ok) throw new Error('Falha ao consultar progresso.');
+          const job = await res.json();
+
+          stageEl.textContent = job.stage || 'Processando...';
+          const pct = job.progress || 0;
+          percentEl.textContent = `${pct}%`;
+          barEl.style.width = `${pct}%`;
+          speedEl.textContent = job.speed ? `Velocidade: ${job.speed}` : '';
+          etaEl.textContent = job.eta ? `Restante: ${job.eta}` : '';
+
+          if (job.status === 'completed') {
+            clearInterval(timer);
+            onDone();
+            // Dispara o download do arquivo finalizado para o PC / Celular
+            const fileUrl = `/api/jobs/${jobId}/file`;
+            const a = document.createElement('a');
+            a.href = fileUrl;
+            a.download = job.filename || 'download';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          } else if (job.status === 'error') {
+            clearInterval(timer);
+            onDone();
+            errorBox.textContent = job.error || 'Ocorreu um erro durante o download.';
+            errorBox.classList.add('active');
+          }
+        } catch (err) {
+          clearInterval(timer);
+          onDone();
+          errorBox.textContent = err.message;
+          errorBox.classList.add('active');
+        }
+      }, 800);
+    }
+
+    loadSystemInfo();
+  </script>
+</body>
+</html>
+
